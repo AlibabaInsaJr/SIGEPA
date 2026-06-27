@@ -2,9 +2,10 @@ package dev.example.SIGEPA.auth.serviceImpl;
 
 import dev.example.SIGEPA.auth.dto.LoginRequestDTO;
 import dev.example.SIGEPA.auth.dto.LoginResponseDTO;
+import dev.example.SIGEPA.auth.service.AuthService;
+import dev.example.SIGEPA.security.JwtService;
 import dev.example.SIGEPA.usuario.entity.Usuario;
 import dev.example.SIGEPA.usuario.repository.UsuarioRepository;
-import dev.example.SIGEPA.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ public class AuthImpService implements AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO dto) {
@@ -29,6 +31,8 @@ public class AuthImpService implements AuthService {
             throw new RuntimeException("Email ou senha inválidos");
         }
 
+        String token = jwtService.gerarToken(usuario);
+
         return LoginResponseDTO.builder()
                 .usuarioId(usuario.getId())
                 .nome(usuario.getNome())
@@ -37,7 +41,7 @@ public class AuthImpService implements AuthService {
                 .roleId(usuario.getRole().getId())
                 .roleNome(usuario.getRole().getNome())
                 .activo(usuario.getActivo())
-                .token(null)
+                .token(token)
                 .build();
     }
 }
